@@ -1,0 +1,14 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProfessorMenu from './professor/ProfessorMenu';
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/professor/*" element={<ProfessorMenu />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;

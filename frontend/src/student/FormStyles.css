@@ -1,0 +1,245 @@
+/* Shared css */
+.form-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 40px;
+  background-color: #f8f9fc;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.form-title {
+  text-align: center;
+  font-size: 24px;
+  color: #2c3e50;
+  margin-bottom: 25px;
+}
+
+
+
+.styled-form .form-group {
+  margin-bottom: 20px;
+}
+
+.styled-form label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.styled-form-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.submit-button {
+  background-color: #3498db;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #2980b9;
+}
+
+/* Shared message styling */
+.submit-message {
+  margin-top: 15px;
+  font-weight: 500;
+  padding: 10px 15px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.submit-message.success {
+  background-color: #eafaf1;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.submit-message.error {
+  background-color: #fbeaea;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+
+.styled-form select,
+.styled-form input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 16px;
+  margin-top: 5px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.styled-form select:focus,
+.styled-form input[type="text"]:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.run-grading-button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.run-grading-button:hover {
+  background-color: #357ab8;
+}
+
+.upload-section {
+  margin-top: 8px;
+}
+
+.upload-label {
+  display: inline-block;
+  background-color: #4a90e2;
+  color: white;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.upload-label:hover {
+  background-color: #357ab8;
+}
+
+.upload-input {
+  display: none;
+}
+
+.uploaded-files {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.uploaded-files ul {
+  margin-top: 5px;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+
+.tab-button {
+  background-color: #e0e0e0;
+  color: #2c3e50;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.tab-button.active {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.submit-message.info {
+  color: #1976d2;
+  font-weight: 500;
+  margin-top: 15px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-button {
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.settings-button:hover {
+  background-color: #2563eb;
+}
+
+.signout-button {
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #dc2626; /* red */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.signout-button:hover {
+  background-color: #b91c1c;
+}
+
+.course-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.add-course-button {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 9999px;
+  font-size: 20px;
+  line-height: 1;
+  background-color: #16a34a;
+  color: #fff;
+  cursor: pointer;
+}
+
+.enroll-row {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0 12px;
+}
+
+.enroll-row .submit-button {
+  width: auto;
+  min-width: 100px;
+}
+
+
+
+
+
+
+

@@ -1,0 +1,156 @@
+.professor-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #f8f9fc;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.professor-header h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.professor-nav {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.professor-nav a {
+  padding: 10px 16px;
+  background-color: #3498db;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.professor-nav a:hover {
+  background-color: #2980b9;
+}
+
+.professor-main {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+
+.course-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.course-card {
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  padding: 14px;
+  background: #fff;
+}
+
+.square-card {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.course-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.course-card-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.course-card-meta, .muted-text {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.course-expand-btn {
+  margin-top: 8px;
+  background: #2563eb;
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.secondary-action-btn,
+.danger-action-btn {
+  margin-top: 8px;
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.secondary-action-btn {
+  background: #475569;
+}
+
+.danger-action-btn {
+  background: #dc2626;
+}
+
+.dashboard-heading-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-actions-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.assignment-list {
+  margin-top: 12px;
+}
+
+.assignment-block h4 {
+  margin: 10px 0 8px;
+  font-size: 15px;
+}
+
+.test-case-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.details-item {
+  align-items: flex-start;
+}
+
+.test-case-actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.test-case-editor {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.test-case-item label {
+  font-size: 13px;
+}
