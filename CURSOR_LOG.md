@@ -71,3 +71,22 @@
   - Key output:
     - `[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0`
     - `[INFO] BUILD SUCCESS`
+
+### Phase C — Grading orchestration layer (Loop 2 extension, RED-only)
+- **Loop #:** 2 (same loop, expanded scope to orchestration hardening)
+- **Initial Strategy:** Security and Resource Audit of the Grading Orchestration Layer (`ProfGradeService`, embedded `InMemoryTestRunner` source, and residual `JwtFilter` failure modes).
+- **Status:** RED tests added first; **no production fixes applied yet** — awaiting student review and explicit “go green” command.
+- **Evidence tests (expected failing until architectural fixes land):**
+  1. **RCE / sandbox gap:** Runner source must declare sandbox or process isolation (currently plain JUnit launcher in-host).
+  2. **Resource hygiene:** `StandardJavaFileManager` must be closed on all compiler paths (currently no `fileManager.close()`).
+  3. **Cross-request / concurrency:** `gradingResultsPath` / `gradingFileName` must not be `static` shared mutable state.
+  4. **Filter resilience:** Unknown user for a parseable JWT must not abort the chain (`UsernameNotFoundException` not caught today).
+
+### Phase D — `ProfGradeService` architectural fixes (Loop 2, GREEN)
+- **Justification:** Architectural resilience is mandatory. Static mutable state in a Spring singleton is a day-one concurrency failure; unclosed compiler file managers are a common production outage pattern; grading CSVs must not fill `java.io.tmpdir` indefinitely.
+- **Fix 1 — Concurrency / stateless service:** Removed `static` `gradingResultsPath` and `gradingFileName`. `runGradingOnFolder` now returns `gradingResultsPath`, `gradingFileName`, and an opaque `downloadId` in the response map. Introduced `GradingArtifactRegistry` to map `downloadId` → absolute path + filename for downloads without storing paths on `ProfGradeService`.
+- **Fix 2 — Resource leak:** Wrapped `StandardJavaFileManager` and `MemoryJavaFileManager` in try-with-resources for each student compile/run block so `close()` runs on success, compilation failure, and exceptions.
+- **Fix 3 — RCE / host API gate:** Added `RestrictedMemoryClassLoader` that defines in-memory compiled classes but **denies** loading `java.lang.System`, `java.io.File`, `java.lang.Runtime`, and `java.lang.ProcessBuilder` before delegating other classes to the parent. Documented in generated runner source that sandbox expectations are tied to this gate; full isolation still requires an out-of-process grader.
+- **Fix 4 — Disk hygiene:** `GradingArtifactRegistry.registerArtifact` calls `deleteOnExit()` on the CSV and runs a `@Scheduled` purge (configurable via `gradify.grading.csv-max-age-hours` and `gradify.grading.csv-cleanup-interval-ms`). `@EnableScheduling` added on `AutoGraderApplication`.
+- **API / client:** `GET /api/professor/grade/results/download` now **requires** query param `downloadId`. `GradePage.js` uses the dev proxy path and passes `downloadId`. Removed redundant `permitAll` on download in `SecurityConfig` (professor routes already enforce `ROLE_PROFESSOR`).
+- **`JwtFilter` (Phase C item 4):** Extended catch to include `UsernameNotFoundException` so a well-formed JWT with a missing user does not abort the filter chain with 500.

@@ -16,11 +16,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -115,6 +117,28 @@ class JwtFilterTest {
         verify(userDetailsService, never()).loadUserByUsername("student1");
         verify(jwtUtil, never()).validateToken(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any());
         assertThat(SecurityContextHolder.getContext().getAuthentication().getName()).isEqualTo("already-auth");
+    }
+
+    /**
+     * Critical pattern: auth filter resilience — {@link JwtFilter} only catches
+     * {@code JwtException} and {@code IllegalArgumentException}. A structurally valid JWT whose
+     * subject does not exist in the user store causes {@link UsernameNotFoundException}, which
+     * propagates and can yield 500 before {@code filterChain.doFilter} completes.
+     * <p>
+     * RED: expect the filter to swallow user-lookup failures and continue the chain unauthenticated.
+     */
+    @Test
+    void givenBearerTokenForUnknownUser_whenFiltering_thenContinuesChainWithoutThrowing() throws ServletException, IOException {
+        when(request.getHeader("Authorization")).thenReturn("Bearer valid-shaped-token");
+        when(jwtUtil.extractUsername("valid-shaped-token")).thenReturn("no-such-user");
+        when(userDetailsService.loadUserByUsername("no-such-user"))
+                .thenThrow(new UsernameNotFoundException("user not found"));
+
+        assertThatCode(() -> jwtFilter.doFilterInternal(request, response, filterChain))
+                .doesNotThrowAnyException();
+
+        verify(filterChain).doFilter(request, response);
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
     }
 
     private static void inject(Object target, String fieldName, Object value) throws Exception {

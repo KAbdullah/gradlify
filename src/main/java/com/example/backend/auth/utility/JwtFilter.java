@@ -52,8 +52,8 @@ public class JwtFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 }
-            } catch (JwtException | IllegalArgumentException ex) {
-                // Invalid JWT should not break the request pipeline.
+            } catch (JwtException | IllegalArgumentException | UsernameNotFoundException ex) {
+                // Invalid JWT or unknown subject must not break the request pipeline (no 500 before chain).
             }
         }
 

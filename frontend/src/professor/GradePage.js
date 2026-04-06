@@ -31,6 +31,8 @@ export default function GradingPage() {
   const [studentFolderFiles, setStudentFolderFiles] = useState([]);
   const [result, setResult] = useState('');
   const [downloadLinkVisible, setDownloadLinkVisible] = useState(false);
+  const [gradingDownloadId, setGradingDownloadId] = useState(null);
+  const [gradingDownloadFileName, setGradingDownloadFileName] = useState('');
   const [customFileName, setCustomFileName] = useState('');
   const [rootFolderName, setRootFolderName] = useState('');
   const [isGrading, setIsGrading] = useState(false);
@@ -113,16 +115,26 @@ export default function GradingPage() {
       setIsGrading(true);
       setResult('');
       setDownloadLinkVisible(false);
+      setGradingDownloadId(null);
+      setGradingDownloadFileName('');
 
       const response = await axios.post("/api/professor/grade/run-folder", formData);
       const results = response.data;
-      // Format result object into a readable string
+      const metaKeys = new Set(['Message', 'gradingResultsPath', 'gradingFileName', 'downloadId']);
+      if (results.downloadId) {
+        setGradingDownloadId(results.downloadId);
+        setGradingDownloadFileName(results.gradingFileName || `${customFileName || 'grading_results'}.csv`);
+      }
       let display = '';
       for (const [student, grade] of Object.entries(results)) {
+        if (metaKeys.has(student)) continue;
         display += `${student}:\n${grade}\n\n`;
       }
+      if (results.Message) {
+        display += `Message:\n${results.Message}\n\n`;
+      }
       setResult(display);
-      setDownloadLinkVisible(true);
+      setDownloadLinkVisible(!!results.downloadId);
     } catch (err) {
       console.error(err);
       setResult(
@@ -210,16 +222,27 @@ export default function GradingPage() {
                 setIsGrading(true);
                 setResult('');
                 setDownloadLinkVisible(false);
+                setGradingDownloadId(null);
+                setGradingDownloadFileName('');
 
                 try {
                   const response = await axios.post("/api/professor/grade/run-folder", formData);
                   const results = response.data;
+                  const metaKeys = new Set(['Message', 'gradingResultsPath', 'gradingFileName', 'downloadId']);
+                  if (results.downloadId) {
+                    setGradingDownloadId(results.downloadId);
+                    setGradingDownloadFileName(results.gradingFileName || `${customFileName || 'grading_results'}.csv`);
+                  }
                   let display = '';
                   for (const [student, grade] of Object.entries(results)) {
+                    if (metaKeys.has(student)) continue;
                     display += `${student}:\n${grade}\n\n`;
                   }
+                  if (results.Message) {
+                    display += `Message:\n${results.Message}\n\n`;
+                  }
                   setResult(display);
-                  setDownloadLinkVisible(true);
+                  setDownloadLinkVisible(!!results.downloadId);
                   setShowConflictUI(false);
                 } catch (err) {
                   console.error(err);
@@ -270,6 +293,8 @@ export default function GradingPage() {
                 setStudentFolderFiles(files);
                 setResult('');
                 setDownloadLinkVisible(false);
+                setGradingDownloadId(null);
+                setGradingDownloadFileName('');
 
                 if (files.length > 0) {
                   const fullPath = files[0].webkitRelativePath;
@@ -319,7 +344,7 @@ export default function GradingPage() {
         </div>
       )}
 
-      {downloadLinkVisible && (
+      {downloadLinkVisible && gradingDownloadId && (
         <div style={{ marginTop: '10px', textAlign: 'center' }}>
           <button
             onClick={async () => {
@@ -327,8 +352,9 @@ export default function GradingPage() {
                 const token = localStorage.getItem('token'); // or however you store JWT
 
                 const response = await axios.get(
-                  "https://gradify.eecs.yorku.ca/api/professor/grade/results/download",
+                  "/api/professor/grade/results/download",
                   {
+                    params: { downloadId: gradingDownloadId },
                     headers: {
                       Authorization: `Bearer ${token}`,
                     },
@@ -340,7 +366,7 @@ export default function GradingPage() {
                 const url = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', `${customFileName || 'grading_results'}.csv`);
+                link.setAttribute('download', gradingDownloadFileName || `${customFileName || 'grading_results'}.csv`);
                 document.body.appendChild(link);
                 link.click();
                 link.remove();
