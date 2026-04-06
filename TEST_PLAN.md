@@ -26,6 +26,7 @@
       - compilation failure
       - timeout
       - runtime exception
+  [STUDENT EDIT]: Refined the Database testing strategy. While we use Mockito for high-level services, we will use @DataJpaTest with an H2 in-memory database     specifically for the CourseRepository. This is necessary to verify the custom logic in findByCodeIgnoreCase, as standard unit tests with mocks cannot detect SQL syntax errors or case-sensitivity issues in JPQL queries.
 - **Deferred integration coverage:**
   - End-to-end compile-and-run tests of real `InMemoryTestRunner` done in a separate integration suite, not blocking core unit suite.
 
@@ -58,6 +59,7 @@
   - Empty submission set / missing files in grading request.
   - Multiple files with invalid class/file name mismatch.
   - Duplicate or malformed test case definitions.
+  - [STUDENT EDIT]: Added a critical check for Filename/Classname Mismatch. The grading suite must handle cases where a student submits a file (e.g., Solution.java) that does not match the public class name or the professor's expected class name. The test should verify that the service returns a specific "Naming Convention Violation" error rather than a generic "System Error."
 - Frontend:
   - Role mismatch redirects user from protected route.
   - Empty code submission UI path and validation messaging.
@@ -67,6 +69,7 @@
 - Backend:
   - JWT expiration path rejects access as expected.
   - Runner timeout or compile error returns stable, parseable error result.
+  - [STUDENT EDIT]: Added Infinite Loop Simulation. We must verify that if a student submission contains an infinite loop, our ProfGradeService correctly catches the TimeoutException from the runner and terminates the process without leaking threads or locking the server.
   - Repository exception path maps to safe API response (no stacktrace leak).
 - Frontend:
   - 401/403 responses show expected UX state and navigation fallback.
@@ -100,6 +103,7 @@
 ### Clock/Timing Risks (JWT Validation)
 - `validateToken` behavior depends on current wall-clock time.
 - Clock skew between issuer and validator can produce intermittent failures near expiry.
+- [STUDENT EDIT]: Identified a specific risk regarding AI Feedback Privacy. Since the app provides AI-generated feedback, we must add a "Privacy Boundary" test. This ensures that any code sent to the external LLM is scrubbed of PII (Personally Identifiable Information) found in comments or strings, preventing data leaks to the AI provider.
 
 **Mitigations**
 - Use controlled clock strategy in tests (time abstraction or narrow token windows with deterministic setup).
@@ -115,6 +119,7 @@
 - [ ] `JwtUtil` tests: token generation claims, valid token, expired token.
 - [ ] `JwtFilter` tests: header absent, malformed bearer token, valid auth context injection.
 - [ ] `SecurityConfig` slice tests: permit-all and role-based endpoint access matrix.
+- [ ] [STUDENT EDIT] Verify CORS and Security Configuration: Ensure the SecurityConfig permits localhost:3000 to prevent blocked requests during frontend-to-backend integration tests.
 
 ### Phase 2: P1 Frontend
 - [ ] Fix/replace obsolete smoke test and establish stable Jest + RTL setup.
