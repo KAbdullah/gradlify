@@ -24,3 +24,50 @@
 - **Real Defect Found:** `validateToken` crashed with `ExpiredJwtException` instead of returning `false`.
 - **Student Decision:** I forced a source-code fix over a test-fix. I rejected the AI's first attempt (narrow catch blocks) in favor of a broader `JwtException` catch to ensure the security filter never leaks library-specific crashes.
 - **Status:** All tests passing.
+
+### Loop 1 Test Log Proof (Both Scenarios)
+- **Scenario A (without `try/catch` in `JwtUtil.validateToken`):**
+  - Key output:
+    - `[ERROR] Tests run: 4, Failures: 0, Errors: 2, Skipped: 0`
+    - `io.jsonwebtoken.ExpiredJwtException: JWT expired ...`
+    - `at com.example.backend.auth.utility.JwtUtil.validateToken(JwtUtil.java:46)`
+    - `[INFO] BUILD FAILURE`
+- **Scenario B (with `try/catch` in `JwtUtil.validateToken`):**
+  - Key output:
+    - `[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0`
+    - `[INFO] BUILD SUCCESS`
+
+## Loop #: 2
+- **Target:** `JwtFilter`
+- **Initial Strategy:** Add isolated filter unit tests (Mockito + servlet mocks, no Spring context) to verify authentication wiring and failure behavior around malformed headers/tokens.
+  Use private-field injection for `jwtUtil` and `userDetailsService` to keep tests focused on request filtering logic and `SecurityContextHolder` side effects.
+
+### Refinement Iteration 1
+- **Issue observed:** The first generated malformed-token test only asserted that `extractUsername` throws, which is a flawed assertion for filter behavior because it validates library parsing, not request-pipeline safety.
+- **Decision:** Fix the test and broaden scope to the real edge case: request must still reach `filterChain` and security context must remain unauthenticated.
+- **Implementation update:** Replaced the throw-centric assertion with behavior assertions (`filterChain.doFilter` invoked, no auth set, no user lookup performed).
+- **Justification:** Filter correctness is resilience under bad inputs; tests should assert externally visible behavior, not internal exception mechanics.
+
+### Refinement Iteration 2
+- **Issue identified:** The behavior-focused malformed-token test initially failed due to a real defect: `JwtFilter` allowed `JwtException` from `extractUsername` to bubble up and break the request path.
+- **Decision (fix test vs fix code vs known issue):** **Fix code**. Keep the stronger test and patch `JwtFilter` to catch `JwtException | IllegalArgumentException` and continue filter chain.
+- **Implementation update:** Wrapped JWT extraction/validation block in a guarded `try/catch` and preserved normal flow to `filterChain.doFilter`.
+- **Justification:** Invalid JWTs are expected hostile input; auth filter must fail closed on auth state but fail open on request pipeline stability (no 500 from token parsing).
+
+### Loop 2 Final Result
+- **Total Iterations:** 2
+- **Real Defect Found:** Malformed bearer token could crash `JwtFilter` before request chain continuation.
+- **Student Decision:** I rejected the weaker exception-only test, strengthened it to a behavioral contract, then fixed production code to satisfy that contract.
+- **Status:** New `JwtFilter` tests pass with resilient malformed-token handling.
+
+### Loop 2 Test Log Proof (Both Scenarios)
+- **Scenario A (without `try/catch` in `JwtFilter`):**
+  - Key output:
+    - `[ERROR] Tests run: 4, Failures: 0, Errors: 1, Skipped: 0`
+    - `io.jsonwebtoken.MalformedJwtException: invalid jwt`
+    - `at com.example.backend.auth.utility.JwtFilter.doFilterInternal(JwtFilter.java:42)`
+    - `[INFO] BUILD FAILURE`
+- **Scenario B (with `try/catch` in `JwtFilter`):**
+  - Key output:
+    - `[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0`
+    - `[INFO] BUILD SUCCESS`
