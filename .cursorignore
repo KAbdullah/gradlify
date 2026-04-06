@@ -1,0 +1,21 @@
+# Build artifacts and generated binaries
+target/            # Maven/Java build outputs
+build/             # Generic build output folder
+dist/              # Frontend distribution bundles
+
+# Dependency/vendor trees
+node_modules/      # NPM dependencies; huge and reproducible
+
+# VCS and IDE metadata
+.git/              # Git object database and refs
+.idea/             # JetBrains project metadata
+.vscode/           # Local editor settings
+
+# Runtime logs and coverage outputs
+coverage/          # Jest/coverage artifacts
+*.log              # Runtime and test logs
+
+# Optional temp/cache directories
+.cache/            # Tooling caches
+tmp/               # Temporary scratch files
+temp/              # Temporary scratch files
