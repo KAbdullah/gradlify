@@ -56,7 +56,7 @@ export default function InstructorReportsPage() {
     if (assignments.length > 0 && selectedAssignments.length === 0 && reportType !== 'average') {
       setSelectedAssignments([assignments[0].id]);
     }
-  }, [assignments, reportType]);
+  }, [assignments, reportType, selectedAssignments.length]);
 
 
   /**

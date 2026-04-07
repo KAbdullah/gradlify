@@ -68,7 +68,7 @@ const Login = () => {
         // Token invalid, clear and stay on login page
         hardLogout();
       });
-  }, []);
+  }, [navigate]);
 
 
 
